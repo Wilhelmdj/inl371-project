@@ -64,8 +64,8 @@ export function Gamification() {
           </GlowCard>
 
           {/* Leaderboard */}
-          <GlowCard glow="blue" className="lg:col-span-1" id="leaderboard">
-            <div className="font-pixel text-[10px] uppercase text-[var(--coin)] mb-4">Top Mentors</div>
+          <GlowCard glow="blue" className="lg:col-span-1">
+            <div id="leaderboard" className="font-pixel text-[10px] uppercase text-[var(--coin)] mb-4">Top Mentors</div>
             <ul className="space-y-2">
               {LEADERBOARD.map((p) => (
                 <li key={p.rank} className="flex items-center justify-between bg-black/30 border-2 border-[var(--ink)] rounded px-3 py-2">
