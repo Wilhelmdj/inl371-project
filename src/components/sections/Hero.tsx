@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { ParallaxWorld } from "./ParallaxWorld";
-import { MiniGame } from "./MiniGame";
+import { FlappyGame } from "@/components/game/FlappyGame";
 import { ArcadeButton } from "@/components/ui/ArcadeButton";
 import { StatCard } from "@/components/ui/StatCard";
 import { Coin } from "@/components/pixel/Coin";
@@ -14,7 +14,7 @@ export function Hero() {
       className="relative min-h-[100vh] w-full overflow-hidden scanlines border-b-4 border-[var(--ink)]"
     >
       <ParallaxWorld />
-      <MiniGame />
+      <FlappyGame />
 
       {/* Floating decorations */}
       <div className="absolute top-32 right-[12%] z-20 pointer-events-none animate-float-slow">
