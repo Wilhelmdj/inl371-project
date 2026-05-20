@@ -61,7 +61,7 @@ export function Hero() {
             src={gameBoyImage}
             alt="Game Boy"
             // Change `scale-[...]` to resize the image (e.g. 1.1, 1.3, 1.6).
-            className="pointer-events-none absolute inset-0 z-0 h-full w-full translate-y-14 object-contain object-center opacity-95 drop-shadow-[0_30px_80px_rgba(0,0,0,0.55)] scale-[1.7] md:scale-[1.85]"
+            className="pointer-events-none absolute inset-0 z-0 h-full w-full translate-y-28 object-contain object-center opacity-95 drop-shadow-[0_30px_80px_rgba(0,0,0,0.55)] scale-[1.7] md:scale-[1.75]"
             draggable={false}
           />
 

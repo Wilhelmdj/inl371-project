@@ -253,16 +253,29 @@ export function FlappyGame() {
   return (
     <div
       ref={wrapRef}
-      className="absolute inset-0 z-10 pointer-events-auto overflow-hidden"
+      className="absolute inset-0 z-10 pointer-events-auto overflow-hidden bg-[#0e1a12]"
       onPointerDown={() => {
         if (statusRef.current === "playing") {
           inputRef.current.tapped = true;
         }
       }}
     >
-      <canvas ref={canvasRef} className="w-full h-full pixelated" />
+      <canvas
+        ref={canvasRef}
+        className={`w-full h-full pixelated transition-opacity duration-300 ${status === "playing" ? "opacity-100" : "opacity-0"}`}
+      />
 
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
+      {status !== "playing" && (
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute inset-0 bg-[#88ab6f]" />
+          <div className="absolute inset-0 opacity-50 [background:repeating-linear-gradient(0deg,rgba(0,0,0,0.18),rgba(0,0,0,0.18)_1px,transparent_1px,transparent_3px)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.10),transparent_55%)]" />
+        </div>
+      )}
+
+      {status === "playing" && (
+        <>
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/90 via-black/0 to-transparent" />
 
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.08),transparent_28%)]" />
@@ -284,6 +297,8 @@ export function FlappyGame() {
           {status === "playing" ? "SPACE / TAP to flap" : status === "gameover" ? "GAME OVER - RESTART OR QUIT" : "PRESS PLAY TO START"}
         </div>
       </div>
+        </>
+      )}
 
       <div className="pointer-events-auto absolute inset-0 flex flex-col items-center justify-center px-6 z-20">
         {status === "idle" && (
