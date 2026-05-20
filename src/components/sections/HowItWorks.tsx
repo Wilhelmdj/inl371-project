@@ -14,18 +14,26 @@ const LEVELS = [
 export function HowItWorks() {
   return (
     <section id="how" className="relative py-24 md:py-32 overflow-hidden border-t-4 border-[var(--ink)]">
-      <div className="absolute inset-0 bg-sky-gradient opacity-90" />
-      <div className="absolute bottom-0 left-0 right-0 h-12 bg-[var(--ink)]" />
-      <div className="absolute bottom-3 left-0 right-0 h-3" style={{ background: "var(--grass)" }} />
+      <div className="absolute inset-0 bg-[#020926]" />
+      <div className="absolute inset-0 pacman-maze opacity-85" />
+      <div className="absolute inset-0 pacman-dots pointer-events-none" />
+      <div className="absolute left-8 top-16 z-10">
+        <div className="pacman w-14 h-14" />
+      </div>
+      <div className="absolute right-10 top-20 z-10 flex gap-3">
+        <div className="ghost ghost-red" />
+        <div className="ghost ghost-pink" />
+        <div className="ghost ghost-blue" />
+      </div>
 
       <div className="relative mx-auto max-w-7xl px-6">
         <div className="text-center mb-14">
-          <div className="inline-flex items-center gap-2 font-pixel text-[10px] px-3 py-2 rounded-md bg-[var(--ink)] text-[var(--coin)] border-2 border-[var(--coin)] mb-6">
-            ★ WORLD MAP
+          <div className="inline-flex items-center gap-2 font-pixel text-[10px] px-3 py-2 rounded-md bg-[#0a0f3a] text-[var(--coin)] border-2 border-[var(--coin)] mb-6">
+            FREE ARCADE DEMO
           </div>
           <h2 className="font-pixel text-2xl md:text-4xl text-[var(--ink)] text-pixel-shadow-sm">How It Works</h2>
           <p className="mt-3 text-[var(--ink)]/80 max-w-2xl mx-auto">
-            Five levels from sign-in to rewards. Beat each one to earn tokens and progress.
+            A retro arcade maze theme behind our game flow – sign in, request help, match, and win tokens in a Pac-Man inspired world.
           </p>
         </div>
 

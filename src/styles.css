@@ -190,6 +190,63 @@
     background: linear-gradient(180deg, var(--sky-night) 0%, var(--sky-deep) 100%);
   }
 
+  .pacman-maze {
+    background-image:
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.06), rgba(255,255,255,0.06) 2px, transparent 2px, transparent 64px),
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0.06) 2px, transparent 2px, transparent 64px),
+      radial-gradient(circle at 15% 15%, rgba(255,255,255,0.1), transparent 16px),
+      radial-gradient(circle at 70% 20%, rgba(255,255,255,0.08), transparent 18px),
+      radial-gradient(circle at 40% 75%, rgba(255,255,255,0.06), transparent 22px);
+    background-size: 64px 64px, 64px 64px, 180px 180px, 160px 160px, 220px 220px;
+  }
+
+  .pacman-dots {
+    background-image: radial-gradient(circle, rgba(255,255,255,0.9) 1px, transparent 1px);
+    background-size: 32px 32px;
+    opacity: 0.65;
+  }
+
+  .pacman {
+    position: relative;
+    background: #ffdc49;
+    border-radius: 50%;
+    clip-path: polygon(100% 50%, 90% 58%, 60% 72%, 60% 28%, 90% 42%);
+    box-shadow: 0 0 0 4px rgba(255,255,255,0.15), inset 0 0 0 6px rgba(0,0,0,0.12);
+  }
+
+  .ghost {
+    width: 3rem;
+    height: 3.2rem;
+    background: #ff5a9b;
+    border-radius: 1.5rem 1.5rem 0 0;
+    position: relative;
+    box-shadow: inset 0 0 0 2px rgba(255,255,255,0.15), 0 0 0 1px rgba(0,0,0,0.18);
+  }
+  .ghost::before {
+    content: "";
+    position: absolute;
+    left: 0.65rem;
+    top: 1.3rem;
+    width: 0.45rem;
+    height: 0.45rem;
+    background: #ffffff;
+    border-radius: 50%;
+    box-shadow: 0.8rem 0 0 #ffffff, 1.6rem 0 0 #ffffff;
+  }
+  .ghost::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 0.8rem;
+    background: linear-gradient(90deg, transparent 0%, #ff5a9b 20%, #ff5a9b 80%, transparent 100%);
+    clip-path: polygon(0 0, 15% 100%, 30% 0, 45% 100%, 60% 0, 75% 100%, 90% 0, 100% 100%, 100% 0);
+  }
+  .ghost-red { background: #ff3d6d; }
+  .ghost-blue { background: #5ae1ff; }
+  .ghost-pink { background: #ff8ae3; }
+
   .animate-float { animation: mtrs-float 4s ease-in-out infinite; }
   .animate-float-slow { animation: mtrs-float 6s ease-in-out infinite; }
   .animate-bob { animation: mtrs-bob 2.4s ease-in-out infinite; }
