@@ -21,10 +21,9 @@ export function HowItWorks() {
           <div className="mb-6 inline-flex items-center gap-2 rounded-md border-2 border-[var(--coin)] bg-[#0a0f3a] px-3 py-2 font-pixel text-[10px] text-[var(--coin)]">
             FREE ARCADE DEMO
           </div>
-          <h2 className="font-pixel text-2xl text-white text-pixel-shadow-sm md:text-4xl">How It Works</h2>
-          <p className="mx-auto mt-3 max-w-2xl text-white/80">
-            A retro arcade maze theme behind our flow—sign in, request help, match, and win tokens in a Pac-Man-inspired world.
-          </p>
+          <h2 className="font-pixel text-2xl text-white text-pixel-shadow-sm md:text-4xl">
+            Navigate the maze of student life with mentorship, rewards, and meaningful progress.
+          </h2>
         </div>
 
         <div className="relative grid items-end gap-6 pb-16 md:grid-cols-5 md:gap-3">
