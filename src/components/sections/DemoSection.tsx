@@ -37,7 +37,7 @@ export function DemoSection() {
             transition={{ duration: 0.6 }}
             className="relative"
           >
-            <div className="mx-auto w-full max-w-md glass-strong rounded-3xl border-4 border-[var(--ink)] p-3 arcade-glow-blue">
+            <div className="mx-auto w-full max-w-lg glass-strong rounded-3xl border-4 border-[var(--ink)] p-3 arcade-glow-blue">
               <div className="aspect-[9/16] rounded-2xl bg-gradient-to-b from-[var(--sky-deep)] to-[var(--sky-night)] border-2 border-[var(--ink)] p-4 flex flex-col gap-3 relative overflow-hidden">
                 <div className="flex items-center justify-between">
                   <div className="font-pixel text-[8px] uppercase opacity-80">MTRS · Power Apps</div>
