@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { ArcadeButton } from "@/components/ui/ArcadeButton";
 import { Coin } from "@/components/pixel/Coin";
 import { Star } from "@/components/pixel/Star";
+import { ContainerScroll } from "@/components/ui/container-scroll-animation";
 
 const CHIPS = ["⚡ Fast", "🔒 Secure", "📊 Trackable", "🤖 Automated"];
 const TX = [
@@ -28,6 +29,7 @@ export function DemoSection() {
 
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Power Apps mock device */}
+          <ContainerScroll titleComponent={<></>}>
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -72,8 +74,10 @@ export function DemoSection() {
               <Star size={36} className="animate-float" />
             </div>
           </motion.div>
+          </ContainerScroll>
 
           {/* Analytics dashboard */}
+          <ContainerScroll titleComponent={<></>}>
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -121,6 +125,7 @@ export function DemoSection() {
               <ArcadeButton variant="secondary" size="md">Use QR Code</ArcadeButton>
             </div>
           </motion.div>
+          </ContainerScroll>
         </div>
       </div>
     </section>
