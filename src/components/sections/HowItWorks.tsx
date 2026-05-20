@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
+import { PacmanBackground } from "@/components/pacman/PacmanBackground";
 import { Coin } from "@/components/pixel/Coin";
-import { Star } from "@/components/pixel/Star";
 import { Pipe } from "@/components/pixel/Pipe";
+import { Star } from "@/components/pixel/Star";
 
 const LEVELS = [
   { n: 1, t: "Sign In", d: "Use your Microsoft 365 campus account to access MTRS securely." },
@@ -13,37 +14,30 @@ const LEVELS = [
 
 export function HowItWorks() {
   return (
-    <section id="how" className="relative py-24 md:py-32 overflow-hidden border-t-4 border-[var(--ink)]">
-      <div className="absolute inset-0 bg-[#020926]" />
-      <div className="absolute inset-0 pacman-maze opacity-85" />
-      <div className="absolute inset-0 pacman-dots pointer-events-none" />
-      <div className="absolute left-8 top-16 z-10">
-        <div className="pacman w-14 h-14" />
-      </div>
-      <div className="absolute right-10 top-20 z-10 flex gap-3">
-        <div className="ghost ghost-red" />
-        <div className="ghost ghost-pink" />
-        <div className="ghost ghost-blue" />
-      </div>
+    <section id="how" className="relative overflow-hidden border-t-4 border-[var(--ink)] py-24 md:py-32">
+      <PacmanBackground />
 
       <div className="relative mx-auto max-w-7xl px-6">
-        <div className="text-center mb-14">
-          <div className="inline-flex items-center gap-2 font-pixel text-[10px] px-3 py-2 rounded-md bg-[#0a0f3a] text-[var(--coin)] border-2 border-[var(--coin)] mb-6">
+        <div className="mb-14 text-center">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-md border-2 border-[var(--coin)] bg-[#0a0f3a] px-3 py-2 font-pixel text-[10px] text-[var(--coin)]">
             FREE ARCADE DEMO
           </div>
-          <h2 className="font-pixel text-2xl md:text-4xl text-[var(--ink)] text-pixel-shadow-sm">How It Works</h2>
-          <p className="mt-3 text-[var(--ink)]/80 max-w-2xl mx-auto">
-            A retro arcade maze theme behind our game flow – sign in, request help, match, and win tokens in a Pac-Man inspired world.
+          <h2 className="font-pixel text-2xl text-white text-pixel-shadow-sm md:text-4xl">How It Works</h2>
+          <p className="mx-auto mt-3 max-w-2xl text-white/80">
+            A retro arcade maze theme behind our flow—sign in, request help, match, and win tokens in a Pac-Man-inspired world.
           </p>
         </div>
 
-        {/* Path connecting levels */}
-        <div className="relative grid md:grid-cols-5 gap-6 md:gap-3 items-end pb-16">
-          <svg className="hidden md:block absolute inset-x-0 top-1/2 -z-0 w-full h-24 pointer-events-none" viewBox="0 0 1000 100" preserveAspectRatio="none">
+        <div className="relative grid items-end gap-6 pb-16 md:grid-cols-5 md:gap-3">
+          <svg
+            className="pointer-events-none absolute inset-x-0 top-1/2 -z-0 hidden h-24 w-full md:block"
+            viewBox="0 0 1000 100"
+            preserveAspectRatio="none"
+          >
             <motion.path
               d="M50,50 Q150,10 250,50 T450,50 T650,50 T850,50 L950,50"
               fill="none"
-              stroke="var(--ink)"
+              stroke="rgba(255,255,255,0.65)"
               strokeWidth="6"
               strokeDasharray="10 10"
               initial={{ pathLength: 0 }}
@@ -62,32 +56,34 @@ export function HowItWorks() {
               transition={{ delay: i * 0.12, duration: 0.5 }}
               className={`relative z-10 ${i % 2 ? "md:translate-y-8" : "md:-translate-y-8"}`}
             >
-              <div className="glass-strong rounded-xl p-5 border-4 border-[var(--ink)] arcade-glow text-center">
-                <div className="flex items-center justify-center mb-3">
+              <div className="glass-strong arcade-glow rounded-xl border-4 border-white/15 p-5 text-center">
+                <div className="mb-3 flex items-center justify-center">
                   <div className="relative">
                     <Star size={48} />
-                    <span className="absolute inset-0 flex items-center justify-center font-pixel text-xs text-[var(--ink)] -mt-1">
+                    <span className="absolute inset-0 -mt-1 flex items-center justify-center font-pixel text-xs text-[var(--ink)]">
                       {lv.n}
                     </span>
                   </div>
                 </div>
                 <div className="font-pixel text-[9px] uppercase text-[var(--mario-red)]">Level {lv.n}</div>
-                <h3 className="font-pixel text-sm mt-2 text-white text-pixel-shadow-sm">{lv.t}</h3>
-                <p className="mt-3 text-xs opacity-90 leading-relaxed">{lv.d}</p>
+                <h3 className="mt-2 font-pixel text-sm text-white text-pixel-shadow-sm">{lv.t}</h3>
+                <p className="mt-3 text-xs leading-relaxed opacity-90">{lv.d}</p>
                 <div className="mt-3 flex items-center justify-center gap-1">
-                  {Array.from({ length: lv.n }).map((_, j) => <Coin key={j} size={14} />)}
+                  {Array.from({ length: lv.n }).map((_, j) => (
+                    <Coin key={j} size={14} />
+                  ))}
                 </div>
               </div>
             </motion.div>
           ))}
         </div>
 
-        {/* Flag at end */}
-        <div className="absolute right-8 bottom-12 z-10 hidden md:flex flex-col items-center">
-          <div className="w-1 h-24 bg-[var(--ink)]" />
+        <div className="absolute bottom-12 right-8 z-10 hidden flex-col items-center md:flex">
+          <div className="h-24 w-1 bg-white/70" />
           <Pipe height={80} />
         </div>
       </div>
     </section>
   );
 }
+
