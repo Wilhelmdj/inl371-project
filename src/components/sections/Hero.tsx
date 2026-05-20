@@ -60,7 +60,8 @@ export function Hero() {
           <img
             src={gameBoyImage}
             alt="Game Boy"
-            className="pointer-events-none absolute inset-0 z-0 h-full w-full object-contain object-center opacity-95 drop-shadow-[0_30px_80px_rgba(0,0,0,0.55)]"
+            // Change `scale-[...]` to resize the image (e.g. 1.1, 1.3, 1.6).
+            className="pointer-events-none absolute inset-0 z-0 h-full w-full object-contain object-center opacity-95 drop-shadow-[0_30px_80px_rgba(0,0,0,0.55)] scale-[1.35] md:scale-[1.5]"
             draggable={false}
           />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,96,96,0.12),transparent_22%)] pointer-events-none" />
