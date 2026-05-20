@@ -4,15 +4,15 @@ export type Ghost = {
   id: GhostId;
   color: string;
   glow: string;
-  speed: number; // relative to pac-man
+  speed: number; // kept for theming; motion uses shared speed in background
   phase: number; // progress offset
 };
 
 export function createGhosts(): Ghost[] {
   return [
-    { id: "blinky", color: "#ff355d", glow: "rgba(255,53,93,0.85)", speed: 1.02, phase: 0.12 },
-    { id: "pinky", color: "#ff7ad9", glow: "rgba(255,122,217,0.8)", speed: 0.98, phase: 0.18 },
-    { id: "inky", color: "#26e6ff", glow: "rgba(38,230,255,0.75)", speed: 1.0, phase: 0.26 },
+    { id: "blinky", color: "#ff355d", glow: "rgba(255,53,93,0.85)", speed: 1, phase: 0.12 },
+    { id: "pinky", color: "#ff7ad9", glow: "rgba(255,122,217,0.8)", speed: 1, phase: 0.18 },
+    { id: "inky", color: "#26e6ff", glow: "rgba(38,230,255,0.75)", speed: 1, phase: 0.26 },
   ];
 }
 

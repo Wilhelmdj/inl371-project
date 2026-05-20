@@ -10,6 +10,8 @@ export type MazeLayout = {
   rows: number;
   cellSize: number;
   padding: number;
+  originX: number;
+  originY: number;
   walls: Array<{ x1: number; y1: number; x2: number; y2: number }>;
 };
 
@@ -65,7 +67,7 @@ export function buildMazeLayout(width: number, height: number): MazeLayout {
   walls.push(seg(toX(cols - 2), toY(rows - 2), toX(cols - 3), toY(rows - 2)));
   walls.push(seg(toX(cols - 2), toY(rows - 2), toX(cols - 2), toY(rows - 3)));
 
-  return { cols, rows, cellSize, padding, walls };
+  return { cols, rows, cellSize, padding, originX, originY, walls };
 }
 
 export function drawMaze(

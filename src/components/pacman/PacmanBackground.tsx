@@ -22,7 +22,7 @@ export function PacmanBackground({ className, overlayOpacity = 0.62 }: Props) {
   const particlesRef = useRef<Particle[]>([]);
   const pelletFieldRef = useRef<PelletField | null>(null);
   const layoutRef = useRef<ReturnType<typeof buildMazeLayout> | null>(null);
-  const pathRef = useRef<Array<{ x: number; y: number }> | null>(null);
+  const pathRef = useRef<ArcPath | null>(null);
   const intersectingRef = useRef(true);
   const docVisibleRef = useRef(true);
 
@@ -72,8 +72,8 @@ export function PacmanBackground({ className, overlayOpacity = 0.62 }: Props) {
       // Cache layout + loop path + pellet field on resize (avoid rebuilding per frame).
       const layout = buildMazeLayout(width, height);
       layoutRef.current = layout;
-      const path = buildLoopPath(layout, width, height);
-      pathRef.current = path;
+      const path = buildLoopPath(layout);
+      pathRef.current = buildArcPath(path);
 
       const mobile = width < 640;
       const baseCount = reducedMotion ? 28 : mobile ? 40 : 64;
@@ -119,7 +119,7 @@ export function PacmanBackground({ className, overlayOpacity = 0.62 }: Props) {
       const intensity = reducedMotion ? 0.72 : 1;
 
       const layout = layoutRef.current ?? buildMazeLayout(width, height);
-      const path = pathRef.current ?? buildLoopPath(layout, width, height);
+      const arcPath = pathRef.current ?? buildArcPath(buildLoopPath(layout));
 
       // Background
       ctx.clearRect(0, 0, width, height);
@@ -135,15 +135,15 @@ export function PacmanBackground({ className, overlayOpacity = 0.62 }: Props) {
       if (pelletFieldRef.current) drawPellets(ctx, pelletFieldRef.current, t, theme, intensity);
 
       // Pac-Man position and heading
-      const pac = sampleLoopWithTangent(path, t);
+      const pac = sampleArcPathWithTangent(arcPath, t);
       const size = Math.max(10, Math.min(18, layout.cellSize * 0.42));
       drawPacman(ctx, pac.x, pac.y, size, pac.angle, nowMs, theme, intensity);
       emitTrail(particlesRef.current, pac.x, pac.y, pac.angle, layout.cellSize, reducedMotion);
 
       // Ghosts chase (fake): offset along same loop with slight lateral wiggle
       for (const g of ghosts) {
-        const gt = (t - g.phase * g.speed + 1) % 1;
-        const gp = sampleLoopWithTangent(path, gt);
+        const gt = (t - g.phase + 1) % 1;
+        const gp = sampleArcPathWithTangent(arcPath, gt);
         const lateral = Math.sin((nowMs / 340) + g.phase * 10) * (layout.cellSize * 0.08);
         const gx = gp.x + Math.cos(gp.angle + Math.PI / 2) * lateral;
         const gy = gp.y + Math.sin(gp.angle + Math.PI / 2) * lateral;
@@ -187,51 +187,69 @@ export function PacmanBackground({ className, overlayOpacity = 0.62 }: Props) {
   );
 }
 
-function buildLoopPath(layout: { cols: number; rows: number; cellSize: number }, width: number, height: number) {
-  const cols = layout.cols;
-  const rows = layout.rows;
+function buildLoopPath(layout: { cols: number; rows: number; cellSize: number; originX: number; originY: number }) {
   const cs = layout.cellSize;
 
-  // Create a loop that reads like "pac-man in a maze": mostly rectangular with a few offsets.
-  const gridW = cols * cs;
-  const gridH = rows * cs;
-  const ox = Math.floor((width - gridW) / 2);
-  const oy = Math.floor((height - gridH) / 2);
+  const cx = (col: number) => layout.originX + (col + 0.5) * cs;
+  const cy = (row: number) => layout.originY + (row + 0.5) * cs;
 
-  const insetX = Math.floor(cs * 1.2);
-  const insetY = Math.floor(cs * 1.15);
-  const baseX = ox + insetX;
-  const baseY = oy + insetY;
-
-  const x0 = baseX + cs * 0.8;
-  const x1 = baseX + cs * (cols - 3.6);
-  const y0 = baseY + cs * 0.8;
-  const y1 = baseY + cs * (rows - 3.2);
-
+  // Corridor-center loop (keeps motion between maze walls).
+  // Using half-cell centers means we're visually "in the hallway", not riding wall strokes.
   return [
-    { x: x0, y: y0 },
-    { x: x1, y: y0 },
-    { x: x1, y: baseY + cs * 2.2 },
-    { x: baseX + cs * 8.0, y: baseY + cs * 2.2 },
-    { x: baseX + cs * 8.0, y: baseY + cs * 5.2 },
-    { x: x1, y: baseY + cs * 5.2 },
-    { x: x1, y: y1 },
-    { x: x0, y: y1 },
-    { x: x0, y: baseY + cs * 5.2 },
-    { x: baseX + cs * 5.2, y: baseY + cs * 5.2 },
-    { x: baseX + cs * 5.2, y: baseY + cs * 2.2 },
-    { x: x0, y: baseY + cs * 2.2 },
+    { x: cx(2), y: cy(1) },
+    { x: cx(11), y: cy(1) },
+    { x: cx(11), y: cy(2) },
+    { x: cx(8), y: cy(2) },
+    { x: cx(8), y: cy(5) },
+    { x: cx(11), y: cy(5) },
+    { x: cx(11), y: cy(6) },
+    { x: cx(2), y: cy(6) },
+    { x: cx(2), y: cy(5) },
+    { x: cx(5), y: cy(5) },
+    { x: cx(5), y: cy(2) },
+    { x: cx(2), y: cy(2) },
   ];
 }
 
-function sampleLoopWithTangent(path: Array<{ x: number; y: number }>, t: number) {
-  const n = path.length;
-  const s = (t % 1) * n;
-  const i0 = Math.floor(s) % n;
-  const i1 = (i0 + 1) % n;
-  const f = s - Math.floor(s);
-  const a = path[i0];
-  const b = path[i1];
+type ArcPath = {
+  points: Array<{ x: number; y: number }>;
+  cumLen: number[]; // cumLen[0]=0 ... cumLen[n]=total
+  total: number;
+};
+
+function buildArcPath(points: Array<{ x: number; y: number }>): ArcPath {
+  const n = points.length;
+  const cumLen: number[] = [0];
+  let total = 0;
+  for (let i = 0; i < n; i++) {
+    const a = points[i]!;
+    const b = points[(i + 1) % n]!;
+    total += Math.hypot(b.x - a.x, b.y - a.y);
+    cumLen.push(total);
+  }
+  return { points, cumLen, total: Math.max(1e-6, total) };
+}
+
+function sampleArcPathWithTangent(path: ArcPath, t: number) {
+  const dist = ((t % 1) + 1) % 1;
+  const target = dist * path.total;
+
+  // Binary search segment index in cumLen
+  let lo = 0;
+  let hi = path.cumLen.length - 1;
+  while (lo < hi) {
+    const mid = Math.floor((lo + hi) / 2);
+    if (path.cumLen[mid]! < target) lo = mid + 1;
+    else hi = mid;
+  }
+
+  const seg = Math.max(1, lo) - 1;
+  const a = path.points[seg % path.points.length]!;
+  const b = path.points[(seg + 1) % path.points.length]!;
+  const segStart = path.cumLen[seg]!;
+  const segEnd = path.cumLen[seg + 1]!;
+  const f = (target - segStart) / Math.max(1e-6, segEnd - segStart);
+
   const x = a.x + (b.x - a.x) * f;
   const y = a.y + (b.y - a.y) * f;
   const angle = Math.atan2(b.y - a.y, b.x - a.x);
