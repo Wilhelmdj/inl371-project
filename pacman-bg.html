@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pac-Man Background Demo</title>
+  <style>
+    :root {
+      --bg-dark: #020816;
+      --maze-blue: #0053a0;
+      --wall-glow: rgba(0, 117, 255, 0.15);
+      --ghost-blinky: #ff1b1b;
+      --ghost-pinky: #ff9be0;
+      --ghost-inky: #66f0f0;
+      --ghost-clyde: #ffb74d;
+      --pacman: #ffea3b;
+      --dot: #f7f7f7;
+      --power-pellet: #fff280;
+      --overlay: rgba(1, 8, 24, 0.72);
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, system-ui, sans-serif;
+      background: radial-gradient(circle at top, rgba(255,255,255,0.04), transparent 32%), var(--bg-dark);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+    }
+
+    .demo-section {
+      position: relative;
+      width: min(1200px, 100%);
+      min-height: 620px;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .pacman-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+
+    .section-content {
+      position: relative;
+      z-index: 1;
+      padding: 36px 42px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 22px;
+      height: 100%;
+      background: linear-gradient(180deg, rgba(1,8,24,0.05), rgba(1,8,24,0.45));
+    }
+
+    .section-content h1 {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 4rem);
+      letter-spacing: 0.08em;
+      line-height: 1.05;
+      text-transform: uppercase;
+    }
+
+    .section-content p {
+      margin: 0;
+      max-width: 720px;
+      font-size: 1rem;
+      line-height: 1.7;
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    .feature-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+      margin-top: auto;
+    }
+
+    .card {
+      padding: 18px 20px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(14px);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.03);
+    }
+
+    .card strong {
+      display: block;
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+
+    .card span {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.92rem;
+      line-height: 1.65;
+    }
+
+    .scanlines {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(rgba(255,255,255,0) 0%, rgba(255,255,255,0.04) 50%, rgba(255,255,255,0) 100%);
+      background-size: 100% 4px;
+      opacity: 0.12;
+      z-index: 2;
+    }
+
+    @media (max-width: 820px) {
+      .demo-section {
+        min-height: 760px;
+      }
+
+      .section-content {
+        padding: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="demo-section">
+    <canvas class="pacman-bg" id="pacmanCanvas"></canvas>
+    <div class="section-content">
+      <div>
+        <div style="display:inline-flex;align-items:center;gap:0.65rem;padding:0.7rem 1rem;background:rgba(255,255,255,0.08);border-radius:999px;border:1px solid rgba(255,255,255,0.12);color:#ffd966;font-size:0.78rem;letter-spacing:0.12em;">PAC-MAN BACKGROUND</div>
+        <h1>How It Works</h1>
+      </div>
+      <p>Experience a retro arcade mood behind your landing page content. This non-playable Pac-Man canvas animation runs in a continuous loop with classic ghosts, pellets, and subtle CRT styling.</p>
+      <div class="feature-cards">
+        <div class="card"><strong>Sign In</strong><span>Users enter their details while the maze pulses softly behind the interface.</span></div>
+        <div class="card"><strong>Request Help</strong><span>Floating pellets and gentle ghost motion keep the background alive without distracting from your call to action.</span></div>
+        <div class="card"><strong>Match &amp; Schedule</strong><span>Classic arcade movement plays beneath text cards, giving the section a fun vintage energy.</span></div>
+      </div>
+    </div>
+    <div class="scanlines"></div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('pacmanCanvas');
+    const ctx = canvas.getContext('2d');
+    const dpi = window.devicePixelRatio || 1;
+
+    const settings = {
+      opacity: 0.85,
+      wall: '#0053a0',
+      wallGlow: 'rgba(0, 83, 160, 0.14)',
+      bg: '#020816',
+      dot: '#fefefe',
+      pellet: '#fff280',
+      pacman: '#ffea3b',
+      ghostStroke: '#0b1330',
+      speed: 1.2,
+      ghostSpeed: 0.92,
+      ghostTurnChance: 0.14,
+    };
+
+    const maze = {
+      rows: 13,
+      cols: 19,
+      cellSize: 26,
+      offsetX: 0,
+      offsetY: 0,
+      walls: [
+        '###################',
+        '#........#........#',
+        '#.###.###.#.###.###',
+        '#o###.###.#.###.###',
+        '#.................#',
+        '#.###.#.#####.#.###',
+        '#.....#...#...#....#',
+        '#####.### # ###.#####',
+        '    #.#     #.#    ',
+        '#####.# #####.######',
+        '#.........#.........#',
+        '#.###.###.#.###.###',
+        '#o..#.....P.....#..o#',
+      ]
+    };
+
+    const pelletMap = [];
+    const powerPellets = [];
+
+    const directions = [
+      { x: 1, y: 0 },
+      { x: -1, y: 0 },
+      { x: 0, y: 1 },
+      { x: 0, y: -1 },
+    ];
+
+    const pacman = {
+      x: 9,
+      y: 12,
+      px: 0,
+      py: 0,
+      dir: { x: -1, y: 0 },
+      mouth: 0,
+      mouthOpen: true,
+    };
+
+    const ghosts = [
+      { name: 'Blinky', color: settings.ghostStroke, x: 9, y: 6, dir: { x: 0, y: -1 }, target: 0 },
+      { name: 'Pinky', color: '#ff9be0', x: 8, y: 7, dir: { x: 0, y: -1 }, target: 1 },
+      { name: 'Inky', color: '#66f0f0', x: 10, y: 7, dir: { x: 0, y: -1 }, target: 2 },
+      { name: 'Clyde', color: '#ffb74d', x: 11, y: 7, dir: { x: 0, y: -1 }, target: 3 },
+    ];
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * dpi;
+      canvas.height = rect.height * dpi;
+      ctx.setTransform(dpi, 0, 0, dpi, 0, 0);
+      maze.cellSize = Math.max(18, Math.min(32, rect.width / maze.cols));
+      maze.offsetX = (rect.width - maze.cols * maze.cellSize) / 2;
+      maze.offsetY = (rect.height - maze.rows * maze.cellSize) / 2;
+    }
+
+    function resetPellets() {
+      pelletMap.length = 0;
+      powerPellets.length = 0;
+      for (let row = 0; row < maze.rows; row++) {
+        pelletMap[row] = [];
+        for (let col = 0; col < maze.cols; col++) {
+          const char = maze.walls[row]?.[col] || ' ';
+          pallet:
+          if (char === '#') {
+            pelletMap[row][col] = false;
+            continue;
+          }
+
+          if (char === 'o') {
+            powerPellets.push({ row, col, active: true, phase: Math.random() * Math.PI * 2 });
+            pelletMap[row][col] = false;
+            continue;
+          }
+
+          if (char === '.' || char === 'P' || char === ' ') {
+            pelletMap[row][col] = true;
+          } else {
+            pelletMap[row][col] = false;
+          }
+        }
+      }
+    }
+
+    function cellCenter(col, row) {
+      return {
+        x: maze.offsetX + col * maze.cellSize + maze.cellSize / 2,
+        y: maze.offsetY + row * maze.cellSize + maze.cellSize / 2,
+      };
+    }
+
+    function drawMaze() {
+      ctx.fillStyle = settings.bg;
+      ctx.fillRect(0, 0, canvas.width / dpi, canvas.height / dpi);
+      ctx.strokeStyle = settings.wall;
+      ctx.lineWidth = 4;
+      for (let row = 0; row < maze.rows; row++) {
+        for (let col = 0; col < maze.cols; col++) {
+          if (maze.walls[row]?.[col] === '#') {
+            const x = maze.offsetX + col * maze.cellSize;
+            const y = maze.offsetY + row * maze.cellSize;
+            ctx.fillStyle = settings.wall;
+            ctx.fillRect(x, y, maze.cellSize, maze.cellSize);
+          }
+        }
+      }
+      ctx.strokeStyle = settings.wallGlow;
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(maze.offsetX + 2, maze.offsetY + 2, maze.cols * maze.cellSize - 4, maze.rows * maze.cellSize - 4);
+    }
+
+    function drawPellets() {
+      const dotRadius = maze.cellSize * 0.08;
+      const pelletRadius = maze.cellSize * 0.16;
+      pelletMap.forEach((row, rowIndex) => {
+        row.forEach((present, colIndex) => {
+          if (!present) return;
+          const { x, y } = cellCenter(colIndex, rowIndex);
+          ctx.fillStyle = settings.dot;
+          ctx.beginPath();
+          ctx.arc(x, y, dotRadius, 0, Math.PI * 2);
+          ctx.fill();
+        });
+      });
+      powerPellets.forEach((pellet) => {
+        const { x, y } = cellCenter(pellet.col, pellet.row);
+        const glow = Math.sin(pellet.phase + performance.now() * 0.006) * 0.2 + 0.8;
+        ctx.fillStyle = `rgba(255, 242, 128, ${0.6 + glow * 0.4})`;
+        ctx.beginPath();
+        ctx.arc(x, y, pelletRadius, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
+
+    function canMove(row, col) {
+      const char = maze.walls[row]?.[col] || ' ';
+      return char !== '#';
+    }
+
+    function clampPosition(entity) {
+      entity.px = Math.max(maze.offsetX + entity.x * maze.cellSize, Math.min(maze.offsetX + entity.x * maze.cellSize, entity.px));
+      entity.py = Math.max(maze.offsetY + entity.y * maze.cellSize, Math.min(maze.offsetY + entity.y * maze.cellSize, entity.py));
+    }
+
+    function updatePacman(delta) {
+      const speed = settings.speed * delta * 0.03 * maze.cellSize;
+      pacman.px += pacman.dir.x * speed;
+      pacman.py += pacman.dir.y * speed;
+      const targetX = maze.offsetX + pacman.x * maze.cellSize;
+      const targetY = maze.offsetY + pacman.y * maze.cellSize;
+      const reachedX = Math.abs(pacman.px - targetX) < 0.5;
+      const reachedY = Math.abs(pacman.py - targetY) < 0.5;
+      if (reachedX && reachedY) {
+        pacman.px = targetX;
+        pacman.py = targetY;
+        const next = getNextPacmanDirection();
+        pacman.dir = next;
+        pacman.x += pacman.dir.x;
+        pacman.y += pacman.dir.y;
+        eatPellets();
+      }
+      if (pacman.mouthOpen) {
+        pacman.mouth += 0.16 * delta;
+        if (pacman.mouth > 0.45) pacman.mouthOpen = false;
+      } else {
+        pacman.mouth -= 0.16 * delta;
+        if (pacman.mouth < 0.1) pacman.mouthOpen = true;
+      }
+    }
+
+    function getNextPacmanDirection() {
+      const path = [
+        { x: -1, y: 0 },
+        { x: 0, y: -1 },
+        { x: 1, y: 0 },
+        { x: 0, y: 1 },
+      ];
+      const preferred = path[pacman.y === 12 ? 0 : pacman.x === 0 ? 1 : pacman.x === 18 ? 1 : 0];
+      const candidates = [preferred, ...path.filter((dir) => dir !== preferred)];
+      for (const dir of candidates) {
+        const nextX = pacman.x + dir.x;
+        const nextY = pacman.y + dir.y;
+        if (canMove(nextY, nextX)) return dir;
+      }
+      return { x: 0, y: 0 };
+    }
+
+    function eatPellets() {
+      if (pelletMap[pacman.y]?.[pacman.x]) {
+        pelletMap[pacman.y][pacman.x] = false;
+      }
+    }
+
+    function drawPacman() {
+      const x = pacman.px + maze.cellSize / 2;
+      const y = pacman.py + maze.cellSize / 2;
+      const radius = maze.cellSize * 0.42;
+      const angle = Math.atan2(pacman.dir.y, pacman.dir.x);
+      const mouthAngle = pacman.mouth;
+      ctx.fillStyle = settings.pacman;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.arc(x, y, radius, angle + mouthAngle, angle - mouthAngle, false);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    function updateGhosts(delta) {
+      const speed = settings.ghostSpeed * delta * 0.03 * maze.cellSize;
+      ghosts.forEach((ghost, index) => {
+        ghost.px = ghost.px ?? (maze.offsetX + ghost.x * maze.cellSize);
+        ghost.py = ghost.py ?? (maze.offsetY + ghost.y * maze.cellSize);
+        ghost.px += ghost.dir.x * speed;
+        ghost.py += ghost.dir.y * speed;
+        const targetX = maze.offsetX + ghost.x * maze.cellSize;
+        const targetY = maze.offsetY + ghost.y * maze.cellSize;
+        const reachedX = Math.abs(ghost.px - targetX) < 0.5;
+        const reachedY = Math.abs(ghost.py - targetY) < 0.5;
+        if (reachedX && reachedY) {
+          ghost.px = targetX;
+          ghost.py = targetY;
+          const next = pickGhostDirection(ghost);
+          ghost.dir = next;
+          ghost.x += ghost.dir.x;
+          ghost.y += ghost.dir.y;
+        }
+      });
+    }
+
+    function pickGhostDirection(ghost) {
+      const target = { x: pacman.x, y: pacman.y };
+      const possible = directions.filter((dir) => {
+        const nextX = ghost.x + dir.x;
+        const nextY = ghost.y + dir.y;
+        return canMove(nextY, nextX) && !(dir.x === -ghost.dir.x && dir.y === -ghost.dir.y);
+      });
+      if (!possible.length) return { x: -ghost.dir.x, y: -ghost.dir.y };
+      possible.sort((a, b) => {
+        const aDist = distance(ghost.x + a.x, ghost.y + a.y, target.x, target.y);
+        const bDist = distance(ghost.x + b.x, ghost.y + b.y, target.x, target.y);
+        const bias = Math.random() * 0.4 - 0.2;
+        return aDist - bDist + bias;
+      });
+      if (Math.random() < settings.ghostTurnChance) {
+        return possible[Math.floor(Math.random() * possible.length)];
+      }
+      return possible[0];
+    }
+
+    function drawGhost(ghost) {
+      const x = ghost.px + maze.cellSize / 2;
+      const y = ghost.py + maze.cellSize / 2;
+      const width = maze.cellSize * 0.82;
+      const height = maze.cellSize * 0.9;
+      const top = y - height / 2;
+      const left = x - width / 2;
+      ctx.fillStyle = ghost.color;
+      ctx.strokeStyle = settings.ghostStroke;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(left, top + height * 0.4);
+      ctx.quadraticCurveTo(left, top, left + width * 0.2, top);
+      ctx.lineTo(left + width * 0.8, top);
+      ctx.quadraticCurveTo(left + width, top, left + width, top + height * 0.4);
+      ctx.lineTo(left + width, top + height * 0.78);
+      ctx.lineTo(left + width * 0.84, top + height * 0.78);
+      ctx.lineTo(left + width * 0.72, top + height * 0.9);
+      ctx.lineTo(left + width * 0.56, top + height * 0.78);
+      ctx.lineTo(left + width * 0.4, top + height * 0.9);
+      ctx.lineTo(left + width * 0.24, top + height * 0.78);
+      ctx.lineTo(left, top + height * 0.78);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // Eyes
+      const eyeRadius = maze.cellSize * 0.12;
+      const pupilOffset = Math.min(eyeRadius * 0.4, 2);
+      const eyeY = top + height * 0.32;
+      const leftEyeX = left + width * 0.28;
+      const rightEyeX = left + width * 0.62;
+      ctx.fillStyle = '#fff';
+      ctx.beginPath();
+      ctx.arc(leftEyeX, eyeY, eyeRadius, 0, Math.PI * 2);
+      ctx.arc(rightEyeX, eyeY, eyeRadius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#0d1a33';
+      ctx.beginPath();
+      ctx.arc(leftEyeX + ghost.dir.x * pupilOffset, eyeY + ghost.dir.y * pupilOffset, eyeRadius * 0.45, 0, Math.PI * 2);
+      ctx.arc(rightEyeX + ghost.dir.x * pupilOffset, eyeY + ghost.dir.y * pupilOffset, eyeRadius * 0.45, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function distance(x1, y1, x2, y2) {
+      return Math.hypot(x1 - x2, y1 - y2);
+    }
+
+    let lastTime = 0;
+    function animate(time) {
+      const delta = Math.min(20, time - lastTime);
+      lastTime = time;
+      drawMaze();
+      drawPellets();
+      updatePacman(delta);
+      drawPacman();
+      updateGhosts(delta);
+      ghosts.forEach(drawGhost);
+      ctx.fillStyle = settings.overlay;
+      ctx.fillRect(0, 0, canvas.width / dpi, canvas.height / dpi);
+      requestAnimationFrame(animate);
+    }
+
+    function initialize() {
+      resizeCanvas();
+      resetPellets();
+      const center = cellCenter(pacman.x, pacman.y);
+      pacman.px = center.x - maze.cellSize / 2;
+      pacman.py = center.y - maze.cellSize / 2;
+      ghosts.forEach((ghost) => {
+        const pos = cellCenter(ghost.x, ghost.y);
+        ghost.px = pos.x - maze.cellSize / 2;
+        ghost.py = pos.y - maze.cellSize / 2;
+      });
+      lastTime = performance.now();
+      requestAnimationFrame(animate);
+    }
+
+    window.addEventListener('resize', () => {
+      resizeCanvas();
+    });
+
+    initialize();
+  </script>
+</body>
+</html>
