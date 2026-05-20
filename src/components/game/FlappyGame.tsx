@@ -286,10 +286,10 @@ export function FlappyGame() {
       </div>
 
       <div className="pointer-events-auto absolute inset-0 flex flex-col items-center justify-center px-6 z-20">
-        {status !== "playing" && (
+        {status === "idle" && (
           <div className="w-full max-w-xs rounded-3xl border-4 border-[var(--ink)] bg-[rgba(10,12,24,0.92)] p-5 text-center shadow-[0_0_40px_rgba(0,0,0,0.45)]">
             <p className="font-pixel text-[11px] uppercase text-[var(--mario-red)] tracking-[0.3em] mb-3">arcade standby</p>
-            <h3 className="font-pixel text-2xl text-white mb-3">Play Flappy, okay.</h3>
+            <h3 className="font-pixel text-2xl text-white mb-3">Play Flappy</h3>
             <p className="font-pixel text-[11px] text-white/80 leading-relaxed mb-5">
               Click play to launch. High score is saved while the session stays open.
             </p>
@@ -301,15 +301,41 @@ export function FlappyGame() {
               >
                 PLAY
               </button>
-              {status === "gameover" && (
-                <button
-                  type="button"
-                  onClick={handleQuit}
-                  className="font-pixel rounded-xl border-2 border-white/15 bg-[rgba(255,255,255,0.05)] px-4 py-3 text-[11px] uppercase text-white hover:bg-white/10"
-                >
-                  QUIT
-                </button>
-              )}
+            </div>
+          </div>
+        )}
+
+        {status === "gameover" && (
+          <div className="w-full max-w-xs rounded-3xl border-4 border-[var(--ink)] bg-[rgba(10,12,24,0.92)] p-5 text-center shadow-[0_0_40px_rgba(0,0,0,0.45)]">
+            <p className="font-pixel text-[11px] uppercase text-[var(--mario-red)] tracking-[0.3em] mb-3">game over</p>
+            <h3 className="font-pixel text-2xl text-white mb-4">Try Again</h3>
+
+            <div className="mb-5 grid grid-cols-2 gap-3">
+              <div className="rounded-2xl border border-white/10 bg-[rgba(255,255,255,0.06)] px-3 py-3">
+                <div className="font-pixel text-[9px] uppercase tracking-[0.25em] text-white/60 mb-1">score</div>
+                <div className="font-pixel text-[18px] text-white">{score.toString().padStart(3, "0")}</div>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-[rgba(255,255,255,0.06)] px-3 py-3">
+                <div className="font-pixel text-[9px] uppercase tracking-[0.25em] text-white/60 mb-1">high</div>
+                <div className="font-pixel text-[18px] text-white">{highScore.toString().padStart(3, "0")}</div>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <button
+                type="button"
+                onClick={handlePlay}
+                className="font-pixel rounded-xl border-2 border-[var(--ink)] bg-[var(--mario-red)] px-4 py-3 text-[11px] uppercase text-white shadow-[0_0_20px_rgba(253,91,106,0.35)] transition hover:bg-[#f95b6a]"
+              >
+                RETRY
+              </button>
+              <button
+                type="button"
+                onClick={handleQuit}
+                className="font-pixel rounded-xl border-2 border-white/15 bg-[rgba(255,255,255,0.05)] px-4 py-3 text-[11px] uppercase text-white hover:bg-white/10"
+              >
+                QUIT
+              </button>
             </div>
           </div>
         )}
