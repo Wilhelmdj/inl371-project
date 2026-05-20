@@ -56,7 +56,7 @@ export function Hero() {
           </div>
         </motion.div>
 
-        <div className="relative pointer-events-auto min-h-[420px] overflow-visible justify-self-end lg:translate-x-6">
+        <div className="relative pointer-events-auto min-h-[420px] w-full max-w-[520px] overflow-visible justify-self-end lg:translate-x-6">
           <img
             src={gameBoyImage}
             alt="Game Boy"
@@ -65,7 +65,7 @@ export function Hero() {
             draggable={false}
           />
 
-          <div className="relative z-10 mx-auto min-h-[380px] w-[92%] max-w-[420px] overflow-hidden rounded-[28px] border-4 border-[var(--ink)] bg-[rgba(4,12,33,0.92)] shadow-[0_0_68px_rgba(0,0,0,0.4)]">
+          <div className="relative z-10 mx-auto min-h-[380px] w-[420px] max-w-full overflow-hidden rounded-[28px] border-4 border-[var(--ink)] bg-[rgba(4,12,33,0.92)] shadow-[0_0_68px_rgba(0,0,0,0.4)]">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,96,96,0.12),transparent_22%)] pointer-events-none" />
             <div className="absolute inset-x-0 top-0 h-12 border-b border-white/10 bg-[rgba(0,0,0,0.12)] backdrop-blur-[8px] pointer-events-none" />
             <div className="absolute top-4 left-4 z-20 font-pixel text-[9px] uppercase tracking-[0.3em] text-[var(--mario-red)] pointer-events-none">Play Flappy</div>
