@@ -61,11 +61,11 @@ export function Hero() {
             src={gameBoyImage}
             alt="Game Boy"
             // Change `scale-[...]` to resize the image (e.g. 1.1, 1.3, 1.6).
-            className="pointer-events-none absolute inset-0 z-0 h-full w-full translate-y-10 object-contain object-center opacity-95 drop-shadow-[0_30px_80px_rgba(0,0,0,0.55)] scale-[1.55] md:scale-[1.7]"
+            className="pointer-events-none absolute inset-0 z-0 h-full w-full translate-y-14 object-contain object-center opacity-95 drop-shadow-[0_30px_80px_rgba(0,0,0,0.55)] scale-[1.7] md:scale-[1.85]"
             draggable={false}
           />
 
-          <div className="relative z-10 mx-auto min-h-[380px] w-[420px] max-w-full overflow-hidden rounded-[28px] border-4 border-[var(--ink)] bg-[rgba(4,12,33,0.92)] shadow-[0_0_68px_rgba(0,0,0,0.4)]">
+          <div className="relative z-10 mx-auto min-h-[350px] w-[380px] max-w-full overflow-hidden rounded-[28px] border-4 border-[var(--ink)] bg-[rgba(4,12,33,0.92)] shadow-[0_0_68px_rgba(0,0,0,0.4)]">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,96,96,0.12),transparent_22%)] pointer-events-none" />
             <div className="absolute inset-x-0 top-0 h-12 border-b border-white/10 bg-[rgba(0,0,0,0.12)] backdrop-blur-[8px] pointer-events-none" />
             <div className="absolute top-4 left-4 z-20 font-pixel text-[9px] uppercase tracking-[0.3em] text-[var(--mario-red)] pointer-events-none">Play Flappy</div>
