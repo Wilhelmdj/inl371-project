@@ -10,10 +10,19 @@ export type PelletField = {
   pellets: Pellet[];
 };
 
-export function buildPellets(layout: MazeLayout, path: Array<{ x: number; y: number }>): PelletField {
+export type PelletOptions = {
+  baseCount?: number;
+  extraCount?: number;
+};
+
+export function buildPellets(
+  layout: MazeLayout,
+  path: Array<{ x: number; y: number }>,
+  options: PelletOptions = {},
+): PelletField {
   // Place pellets along the motion path at regular intervals.
   const pellets: Pellet[] = [];
-  const count = 64;
+  const count = Math.max(24, Math.floor(options.baseCount ?? 64));
   const offset = Math.random() * 0.02;
 
   for (let i = 0; i < count; i++) {
@@ -23,7 +32,7 @@ export function buildPellets(layout: MazeLayout, path: Array<{ x: number; y: num
   }
 
   // Sprinkle a few extra "side corridor" pellets for depth.
-  const extras = Math.max(10, Math.floor((layout.cols * layout.rows) / 6));
+  const extras = Math.max(6, Math.floor(options.extraCount ?? Math.floor((layout.cols * layout.rows) / 6)));
   for (let i = 0; i < extras; i++) {
     const p = (Math.random() + offset) % 1;
     const base = sampleLoop(path, p);

@@ -21,6 +21,10 @@ export function PacmanBackground({ className, overlayOpacity = 0.62 }: Props) {
   const ghosts = useMemo(() => createGhosts(), []);
   const particlesRef = useRef<Particle[]>([]);
   const pelletFieldRef = useRef<PelletField | null>(null);
+  const layoutRef = useRef<ReturnType<typeof buildMazeLayout> | null>(null);
+  const pathRef = useRef<Array<{ x: number; y: number }> | null>(null);
+  const intersectingRef = useRef(true);
+  const docVisibleRef = useRef(true);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -49,18 +53,35 @@ export function PacmanBackground({ className, overlayOpacity = 0.62 }: Props) {
     let width = 1;
     let height = 1;
     let dpr = 1;
+    let targetFps = 45;
+    let renderAccumulatorMs = 0;
 
     const updateSize = () => {
       const rect = container.getBoundingClientRect();
       width = Math.max(1, Math.floor(rect.width));
       height = Math.max(1, Math.floor(rect.height));
-      dpr = Math.min(2, Math.max(1, window.devicePixelRatio || 1));
+      const isSmall = width < 680 || height < 520;
+      const maxDpr = reducedMotion ? 1.25 : isSmall ? 1.5 : 2;
+      dpr = Math.min(maxDpr, Math.max(1, window.devicePixelRatio || 1));
       canvas.width = Math.floor(width * dpr);
       canvas.height = Math.floor(height * dpr);
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      pelletFieldRef.current = null;
+
+      // Cache layout + loop path + pellet field on resize (avoid rebuilding per frame).
+      const layout = buildMazeLayout(width, height);
+      layoutRef.current = layout;
+      const path = buildLoopPath(layout, width, height);
+      pathRef.current = path;
+
+      const mobile = width < 640;
+      const baseCount = reducedMotion ? 28 : mobile ? 40 : 64;
+      const extraCount = reducedMotion ? 8 : mobile ? 10 : 14;
+      pelletFieldRef.current = buildPellets(layout, path, { baseCount, extraCount });
+
+      targetFps = reducedMotion ? 24 : mobile ? 30 : 45;
+      renderAccumulatorMs = 0;
     };
 
     updateSize();
@@ -68,20 +89,37 @@ export function PacmanBackground({ className, overlayOpacity = 0.62 }: Props) {
     const resizeObserver = new ResizeObserver(() => updateSize());
     resizeObserver.observe(container);
 
+    const intersectionObserver = new IntersectionObserver(
+      (entries) => {
+        intersectingRef.current = entries.some((e) => e.isIntersecting);
+      },
+      { root: null, threshold: 0.06 },
+    );
+    intersectionObserver.observe(container);
+
+    const onVisibility = () => {
+      docVisibleRef.current = document.visibilityState === "visible";
+    };
+    document.addEventListener("visibilitychange", onVisibility, { passive: true });
+
     let t = Math.random();
     const secondsPerLoop = reducedMotion ? 18 : 10.5;
 
     const loop = new AnimationLoop(({ dtMs, nowMs }) => {
-      if (reducedMotion) {
-        // Still render but slow and with fewer effects.
-      }
+      if (!intersectingRef.current || !docVisibleRef.current) return;
 
-      t = (t + dtMs / 1000 / secondsPerLoop) % 1;
-      const intensity = reducedMotion ? 0.75 : 1;
+      renderAccumulatorMs += dtMs;
+      const minFrameMs = 1000 / targetFps;
+      if (renderAccumulatorMs < minFrameMs) return;
+      // Keep time stable if we miss frames.
+      const stepMs = Math.min(64, renderAccumulatorMs);
+      renderAccumulatorMs = 0;
 
-      const layout = buildMazeLayout(width, height);
-      const path = buildLoopPath(layout, width, height);
-      if (!pelletFieldRef.current) pelletFieldRef.current = buildPellets(layout, path);
+      t = (t + stepMs / 1000 / secondsPerLoop) % 1;
+      const intensity = reducedMotion ? 0.72 : 1;
+
+      const layout = layoutRef.current ?? buildMazeLayout(width, height);
+      const path = pathRef.current ?? buildLoopPath(layout, width, height);
 
       // Background
       ctx.clearRect(0, 0, width, height);
@@ -125,10 +163,12 @@ export function PacmanBackground({ className, overlayOpacity = 0.62 }: Props) {
     return () => {
       loop.stop();
       resizeObserver.disconnect();
+      intersectionObserver.disconnect();
+      document.removeEventListener("visibilitychange", onVisibility);
     };
   }, [ghosts, reducedMotion]);
 
-    return (
+  return (
     <motion.div
       ref={containerRef}
       className={["absolute inset-0 -z-10", className].filter(Boolean).join(" ")}
@@ -295,7 +335,7 @@ function emitTrail(particles: Particle[], x: number, y: number, angle: number, c
     const max = (reduced ? 0.35 : 0.55) + Math.random() * 0.35;
     particles.push({ x, y, vx, vy, life: 0, max });
   }
-  const maxParticles = reduced ? 80 : 160;
+  const maxParticles = reduced ? 60 : 120;
   if (particles.length > maxParticles) particles.splice(0, particles.length - maxParticles);
 }
 
