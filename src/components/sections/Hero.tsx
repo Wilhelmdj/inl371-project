@@ -60,13 +60,16 @@ export function Hero() {
           <img
             src={gameBoyImage}
             alt="Game Boy"
-            className="pointer-events-none absolute inset-0 z-0 h-full w-full object-contain object-center opacity-95 drop-shadow-[0_30px_80px_rgba(0,0,0,0.55)]"
+            className="pointer-events-none absolute inset-0 z-0 h-full w-full object-contain object-center opacity-95 drop-shadow-[0_30px_80px_rgba(0,0,0,0.55)] scale-[1.22] md:scale-[1.32]"
             draggable={false}
           />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,96,96,0.12),transparent_22%)] pointer-events-none" />
           <div className="absolute inset-x-0 top-0 h-12 border-b border-white/10 bg-[rgba(0,0,0,0.12)] backdrop-blur-[8px] pointer-events-none" />
           <div className="absolute top-4 left-4 z-20 font-pixel text-[9px] uppercase tracking-[0.3em] text-[var(--mario-red)] pointer-events-none">Play Flappy</div>
-          <FlappyGame />
+
+          <div className="absolute left-1/2 top-[54%] z-10 h-[68%] w-[72%] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[22px]">
+            <FlappyGame />
+          </div>
         </div>
       </div>
 
