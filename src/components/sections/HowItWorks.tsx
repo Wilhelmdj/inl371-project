@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 import { PacmanBackground } from "@/components/pacman/PacmanBackground";
 import { Coin } from "@/components/pixel/Coin";
-import { Pipe } from "@/components/pixel/Pipe";
 import { Star } from "@/components/pixel/Star";
 
 const LEVELS = [
@@ -29,24 +28,6 @@ export function HowItWorks() {
         </div>
 
         <div className="relative grid items-end gap-6 pb-16 md:grid-cols-5 md:gap-3">
-          <svg
-            className="pointer-events-none absolute inset-x-0 top-1/2 -z-0 hidden h-24 w-full md:block"
-            viewBox="0 0 1000 100"
-            preserveAspectRatio="none"
-          >
-            <motion.path
-              d="M50,50 Q150,10 250,50 T450,50 T650,50 T850,50 L950,50"
-              fill="none"
-              stroke="rgba(255,255,255,0.65)"
-              strokeWidth="6"
-              strokeDasharray="10 10"
-              initial={{ pathLength: 0 }}
-              whileInView={{ pathLength: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 2 }}
-            />
-          </svg>
-
           {LEVELS.map((lv, i) => (
             <motion.div
               key={lv.n}
@@ -56,7 +37,7 @@ export function HowItWorks() {
               transition={{ delay: i * 0.12, duration: 0.5 }}
               className={`relative z-10 ${i % 2 ? "md:translate-y-8" : "md:-translate-y-8"}`}
             >
-              <div className="glass-strong arcade-glow rounded-xl border-4 border-white/15 p-5 text-center">
+              <div className="glass-strong arcade-glow rounded-xl border-4 border-white/15 bg-[#0a0f3a]/85 p-5 text-center backdrop-blur-md">
                 <div className="mb-3 flex items-center justify-center">
                   <div className="relative">
                     <Star size={48} />
@@ -77,13 +58,7 @@ export function HowItWorks() {
             </motion.div>
           ))}
         </div>
-
-        <div className="absolute bottom-12 right-8 z-10 hidden flex-col items-center md:flex">
-          <div className="h-24 w-1 bg-white/70" />
-          <Pipe height={80} />
-        </div>
       </div>
     </section>
   );
 }
-
