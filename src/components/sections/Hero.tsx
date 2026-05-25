@@ -7,6 +7,8 @@ import { Star } from "@/components/pixel/Star";
 import { Mushroom } from "@/components/pixel/Mushroom";
 import gameBoyImage from "@/assets/GameBoy.png";
 
+const APP_URL = "https://make.powerapps.com/e/Default-ea1a909b-6600-4a25-82a5-0c6ed7d0513b/canvas/?action=edit&app-id=%2Fproviders%2FMicrosoft.PowerApps%2Fapps%2F0834891f-46bd-4849-8298-115b8cd6dead";
+
 export function Hero() {
   return (
     <section
@@ -50,9 +52,20 @@ export function Hero() {
             secure Microsoft 365 A3 sign-in.
           </p>
           <div className="mt-8 flex flex-wrap gap-4">
-            <ArcadeButton variant="primary" size="lg">▶ Press Start</ArcadeButton>
-            <ArcadeButton variant="secondary" size="lg">🚀 Launch MTRS App</ArcadeButton>
-            <ArcadeButton variant="ghost" size="lg">📖 Learn How It Works</ArcadeButton>
+            <ArcadeButton
+              variant="secondary"
+              size="lg"
+              onClick={() => (window.location.href = APP_URL)}
+            >
+              🚀 Launch MTRS App
+            </ArcadeButton>
+            <ArcadeButton
+              variant="ghost"
+              size="lg"
+              onClick={() => (window.location.href = "#how")}
+            >
+              📖 Learn How It Works
+            </ArcadeButton>
           </div>
         </motion.div>
 

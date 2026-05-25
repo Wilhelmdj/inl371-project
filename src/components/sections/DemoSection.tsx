@@ -4,6 +4,8 @@ import { Coin } from "@/components/pixel/Coin";
 import { Star } from "@/components/pixel/Star";
 import { ContainerScroll } from "@/components/ui/container-scroll-animation";
 
+const APP_URL = "https://make.powerapps.com/e/Default-ea1a909b-6600-4a25-82a5-0c6ed7d0513b/canvas/?action=edit&app-id=%2Fproviders%2FMicrosoft.PowerApps%2Fapps%2F0834891f-46bd-4849-8298-115b8cd6dead";
+
 const CHIPS = ["⚡ Fast", "🔒 Secure", "📊 Trackable", "🤖 Automated"];
 const TX = [
   { who: "Session w/ M. Dlamini", v: "+25" },
@@ -121,8 +123,20 @@ export function DemoSection() {
               ))}
             </div>
             <div className="flex flex-wrap gap-3 mt-6">
-              <ArcadeButton variant="primary" size="md">Launch App</ArcadeButton>
-              <ArcadeButton variant="secondary" size="md">Use QR Code</ArcadeButton>
+              <ArcadeButton
+                variant="primary"
+                size="md"
+                onClick={() => (window.location.href = APP_URL)}
+              >
+                Launch App
+              </ArcadeButton>
+              <ArcadeButton
+                variant="secondary"
+                size="md"
+                onClick={() => (window.location.href = "#qr")}
+              >
+                Use QR Code
+              </ArcadeButton>
             </div>
           </motion.div>
           </ContainerScroll>
